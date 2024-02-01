@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" integrity="sha512-EZLkOqwILORob+p0BXZc+Vm3RgJBOe1Iq/0fiI7r/wJgzOFZMlsqTa29UEl6v6U6gsV4uIpsNZoV32YZqrCRCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+    <link rel="stylesheet" href="/styles/dash_style.css" />
+    <title>Dashboard</title>
+  </head>
+  <body>
+    <div id="loading" class="hideElement">
+      <div id="loader"></div>
+    </div>
+    <header><a href="/users/logout">LogOut</a>
+    <a href="/users/changepassword">Change Password</a>
+    <% if(locals.role === "ADMIN"){ %>
+    <a href="/users/register" id="addUser">Add new user</a>
+    <% } %>
+    </header>
+    <nav id="navigation">
+      <span></span>
+      <ul>
+        <li id="change_password">Change Password</li>
+        <li id="err1554">Error 1554</li>
+        <li id="fixPay">Fix something</li>
+        <li id="call_support">Call Support</li>
+      </ul>
+    </nav>
+    <main id="password" class="enable">
+      <input type="hidden" id="ch_pass_req" value="<%= locals.done %>" />
+      <h3 class="title">Change password</h3>
+      <form action="/change-password" method="post" autocomplete="off">
+        <input
+          class="submitField"
+          type="text"
+          name="username"
+          placeholder="Username"
+          required
+          minlength="8"
+          maxlength="8"
+        />
+        <input type="submit" value="Send" class="submitButtom" />
+      </form>
+      <h3 class="output"><%= locals.result %></h3>
+      <table>
+        <tr>
+          <th>USER</th>
+          <th>TIME</th>
+          <th>USERNAME</th>
+          <th>FOLIO ID</th>
+          <th>FIRST NAME</th>
+          <th>LAST NAME</th>
+        </tr>
+        <% if (locals.passLogs) { %> <% locals.passLogs.forEach(elements => { %>
+        <tr>
+          <% elements.forEach(element => { %>
+          <td><%= element %></td>
+          <% }) %>
+        </tr>
+        <% }) %> <% } %>
+      </table>
+    </main>
+    <main id="expand_err1554">
+      <h3 class="title">Fix error 1554</h3>
+      <form action="/some_page" method="post" autocomplete="off">
+        <input
+        class="submitField"
+          type="text"
+          name="username"
+          placeholder="Username"
+          required
+          minlength="8"
+          maxlength="8"
+        />
+        <input type="submit" value="Send" class="submitButtom"/>
+      </form>
+    </main>
+    <main id="expand_fixPay">Fix Pay</main>
+    <main id="expand_Support">Call support</main>
+    <script src="/javaschript/jquery.min.js"></script>
+    <script src="/javaschript/dhb.js"></script>
+  </body>
+</html>
