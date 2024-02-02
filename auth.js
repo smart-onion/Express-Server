@@ -1,5 +1,5 @@
 import bcript from "bcrypt";
-import pool from "./dbConfig.js";
+import pool from "./utils/dbConfig.js";
 import rateLimit from "express-rate-limit";
 
 const setRateLimit = rateLimit({
@@ -18,7 +18,7 @@ const setLoginAttempts = rateLimit({
 
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
-    return res.redirect("/users/dashboard");
+    return res.send("success");
   }
   next();
 }
@@ -27,7 +27,7 @@ function checkNotAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect("/users/login");
+  res.send("fooo");
 }
 
 function isAdminRole(req, res, next) {

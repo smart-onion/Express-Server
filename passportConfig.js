@@ -1,7 +1,11 @@
 import localStrategy from "passport-local";
-import pool from "./dbConfig.js";
+import pool from "./utils/dbConfig.js";
 import bcript from "bcrypt";
+import dotenv from "dotenv";
+import jwtStrategy from "passport-jwt";
+import passport from "passport";
 
+dotenv.config();
 function initialize(passport) {
   const authenticateUser = (username, password, done) => {
     pool.query(
@@ -43,4 +47,11 @@ function initialize(passport) {
   });
 }
 
+const jwtOptions = {
+  jwtFromRequest: jwtStrategy.ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env, // Replace with your actual secret key
+};
+passport.use(new jwtStrategy.Strategy(jwtOptions, (payload, done) => {
+  
+}))
 export default initialize;

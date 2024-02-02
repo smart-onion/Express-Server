@@ -1,12 +1,15 @@
 import express from "express";
 import bodyParser from "body-parser";
-import pool from "./dbConfig.js";
-import bcript from "bcrypt";
+import pool from "./utils/dbConfig.js";
 import session from "express-session";
-import flash from "express-flash";
-import passport from "passport";
 import initialize from "./passportConfig.js";
 import axios from "axios";
+import dotenv from "dotenv";
+import authRoute from "./routes/authentication.js";
+import createUserRoute from "./routes/createNewUser.js";
+import cors from "cors";
+dotenv.config();
+
 import {
   checkAuthenticated,
   checkNotAuthenticated,
@@ -16,135 +19,82 @@ import {
   setRateLimit,
 } from "./auth.js";
 
+const corsOptions = {
+  credentials: true,
+  origin: "http://localhost:3000",
+  optionSuccessStatus: 200,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+};
 const PORT = process.env.PORT || 4000;
 const server = express();
 const Log = [];
 let doneProcess;
 
-initialize(passport);
-
-server.use(bodyParser.urlencoded({ extended: true }));
-server.use(flash());
+// initialize(passport);
+server.use(cors(corsOptions));
+server.use(express.json());
+// server.use(bodyParser.urlencoded({ extended: true }));
+// server.use(flash());
 server.use(
   session({
-    secret: "secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
   })
 );
-server.use(passport.initialize());
-server.use(passport.session());
+// server.use(passport.initialize());
+// server.use(passport.session());
 server.use(express.static("public"));
 server.use(setRateLimit);
 // Home Page
-server.get("/", checkNotAuthenticated, (req, res) => {
-  res.render("login.ejs", { port: PORT });
-});
+// server.get("/", checkNotAuthenticated, (req, res) => {
+//   res.render("login.ejs", { port: PORT });
+// });
 
 // Render login page
-server.get("/users/login", checkAuthenticated, (req, res) => {
-  res.render("login.ejs");
-});
+// server.get("/users/login", checkAuthenticated, (req, res) => {
+//   res.render("login.ejs");
+// });
 
 // Register page
-server.get(
-  "/users/register",
-  checkNotAuthenticated,
-  isAdminRole,
-  (req, res) => {
-    res.render("register.ejs");
-  }
-);
+// server.get(
+//   "/users/register",
+//   checkNotAuthenticated,
+//   isAdminRole,
+//   (req, res) => {
+//     res.render("register.ejs");
+//   }
+// );
 
-server.get("/users/dashboard", checkNotAuthenticated, async (req, res) => {
-  axios.post("http://localhost:5000", { sessionID: req.hostname });
-  const passLogs = await axios.get("http://localhost:5000/pass-logs");
-  res.render("dashboard.ejs", {
-    user: req.user.username,
-    passLogs: passLogs.data,
-    result: Log || null,
-    done: doneProcess || null,
-    role: req.user.role || null,
-  });
-  Log.pop();
-  doneProcess = null;
-});
+// server.get("/users/dashboard", checkNotAuthenticated, async (req, res) => {
+//   axios.post("http://localhost:5000", { sessionID: req.hostname });
+//   const passLogs = await axios.get("http://localhost:5000/pass-logs");
+//   res.render("dashboard.ejs", {
+//     user: req.user.username,
+//     passLogs: passLogs.data,
+//     result: Log || null,
+//     done: doneProcess || null,
+//     role: req.user.role || null,
+//   });
+//   Log.pop();
+//   doneProcess = null;
+// });
 
-server.get("/users/logout", (req, res, next) => {
-  req.logout((err) => {
-    if (err) throw err;
-    res.redirect("/users/login");
-  });
-});
+// server.get("/users/logout", (req, res, next) => {
+//   req.logout((err) => {
+//     if (err) throw err;
+//     res.redirect("/users/login");
+//   });
+// });
 
-server.get("/users/changepassword", checkNotAuthenticated, (req, res) => {
-  res.render("changePass.ejs", { username: req.user.username });
-});
+// server.get("/users/changepassword", checkNotAuthenticated, (req, res) => {
+//   res.render("changePass.ejs", { username: req.user.username });
+// });
 
-// Get credential
-server.post(
-  "/users/register",
-  checkNotAuthenticated,
-  isAdminRole,
-  async (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
-    const role = req.body.role;
-    console.log(role);
-
-    let errors = [];
-
-    if (!username || !password) {
-      errors.push({ message: "Enter all fields!" });
-    }
-
-    if (password.length < 6) {
-      errors.push({ message: "Password should be at least 6 characters!" });
-    }
-
-    if (errors.length > 0) {
-      console.log(errors);
-      res.render("register.ejs", { errors: errors });
-    } else {
-      // form validation has passed
-      let hashedPassword = await bcript.hash(password, 10);
-      pool.query(
-        "SELECT * FROM users WHERE username=$1",
-        [username],
-        (err, result) => {
-          if (err) throw err;
-          console.log(result.rows);
-          if (result.rows.length > 0) {
-            errors.push({ message: "Username already exist!" });
-            res.render("register.ejs", { errors: errors });
-          } else {
-            pool.query(
-              "INSERT INTO users (username, password, role) VALUES ($1, $2, $3) RETURNING id, password",
-              [username, hashedPassword, role],
-              (err, result) => {
-                if (err) throw err;
-                console.log(result.rows);
-                req.flash("success_msg", "You registered. Please log in");
-                res.redirect("/users/login");
-              }
-            );
-          }
-        }
-      );
-    }
-  }
-);
-
-server.post(
-  "/users/login",
-  setLoginAttempts,
-  passport.authenticate("local", {
-    successRedirect: "/users/dashboard",
-    failureRedirect: "/users/login",
-    failureFlash: true,
-    failureMessage: true,
-  })
-);
+// Create or delete user
+server.use("/create-user", createUserRoute);
+// Login user
+server.use("/login", authRoute);
 
 server.post("/change-password", checkNotAuthenticated, async (req, res) => {
   const result = await axios.post("http://localhost:5000/change-password", {
@@ -185,16 +135,6 @@ server.post(
   }
 );
 
-server.get("/delete", async (req, res) => {
-  const result = await axios.post("http://localhost:5000/delete-driver", {
-    hostname: req.hostname,
-  });
-  console.log(result);
-});
-server.get("/test", (req,res)=>{
-  console.log(req)
-  res.send(true)
-})
 // Server listening
 server.listen(PORT, () => {
   console.log(`Server listening at port ${PORT}`);
