@@ -27,14 +27,15 @@ function checkNotAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect("/users/login");
+  ;
 }
 
 function isAdminRole(req, res, next) {
-  if (req.user.role === "ADMIN") {
+  if (req.user?.role === "ADMIN") {
+    req.session.role = true
     return next();
   }
-  res.send("NOT_PERMITED");
+  res.redirect("/users/login");
 }
 
 async function changePassword(username, currPassord, newPassword) {
