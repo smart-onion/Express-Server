@@ -1,4 +1,4 @@
-import bcript from "bcrypt";
+import bcrypt from "bcrypt";
 import pool from "./dbConfig.js";
 import rateLimit from "express-rate-limit";
 
@@ -27,18 +27,18 @@ function checkNotAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  ;
+  return res.redirect("/users/login");
 }
 
 function isAdminRole(req, res, next) {
   if (req.user?.role === "ADMIN") {
-    req.session.role = true
+    req.session.role = true;
     return next();
   }
   res.redirect("/users/login");
 }
 
-async function changePassword(username, currPassord, newPassword) {
+async function changePassword(username, currPassword, newPassword) {
   let done;
   let updatePassword = new Promise((resolve, error) => {
     pool.query(
@@ -49,10 +49,10 @@ async function changePassword(username, currPassord, newPassword) {
         if (err) console.log("text", err);
         if (result.rows.length > 0) {
           const user = result.rows[0];
-          bcript.compare(currPassord, user.password, async (err, isMatch) => {
+          bcrypt.compare(currPassword, user.password, async (err, isMatch) => {
             if (err) throw err;
             if (isMatch) {
-              let hashPassword = await bcript.hash(newPassword, 10);
+              let hashPassword = await bcrypt.hash(newPassword, 10);
               console.log(hashPassword);
               pool.query("UPDATE users SET password = $1 WHERE username=$2", [
                 hashPassword,

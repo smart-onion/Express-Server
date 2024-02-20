@@ -23,11 +23,13 @@
     "express-flash": "^0.0.2",
     "express-rate-limit": "^7.1.5",
     "express-session": "^1.17.3",
+    "express-winston": "^4.2.0",
     "jquery": "^3.7.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pg": "^8.11.3",
     "popper.js": "^1.16.1",
-    "selenium-webdriver": "^4.16.0"
+    "selenium-webdriver": "^4.16.0",
+    "winston": "^3.11.0"
   }
 }

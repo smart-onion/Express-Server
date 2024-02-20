@@ -1,6 +1,6 @@
 import localStrategy from "passport-local";
 import pool from "./dbConfig.js";
-import bcript from "bcrypt";
+import bcrypt from "bcrypt";
 
 function initialize(passport) {
   const authenticateUser = (username, password, done) => {
@@ -13,7 +13,7 @@ function initialize(passport) {
         if (result.rows.length > 0) {
           const user = result.rows[0];
 
-          bcript.compare(password, user.password, (err, isMatch) => {
+          bcrypt.compare(password, user.password, (err, isMatch) => {
             if (err) throw err;
 
             if (isMatch) {

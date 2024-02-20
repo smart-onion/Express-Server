@@ -1,3 +1,4 @@
+// import dependencies
 import express from "express";
 import bodyParser from "body-parser";
 import session from "express-session";
@@ -6,6 +7,8 @@ import passport from "passport";
 import initialize from "./utils/passportConfig.js";
 import axios from "./utils/axios.js";
 import cookieParser from "cookie-parser";
+import logger from "./utils/logger.js";
+import expressWinston from "express-winston";
 import { checkNotAuthenticated, setRateLimit } from "./utils/auth.js";
 
 // import routes
@@ -25,7 +28,7 @@ server.use(bodyParser.urlencoded({ extended: true }));
 server.use(flash());
 server.use(
   session({
-    secret: "secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
   })
@@ -33,12 +36,20 @@ server.use(
 server.use(passport.initialize());
 server.use(passport.session());
 server.use(express.static("public"));
-server.use("/css", express.static("node_modules/boxicons/"));
+// server.use("/css", express.static("node_modules/boxicons/"));
 server.use("/css", express.static("node_modules/bootstrap/dist/css"));
 server.use("/js", express.static("node_modules/bootstrap/dist/js"));
 server.use("/js", express.static("node_modules/jquery/dist"));
 
 server.use(setRateLimit);
+
+server.use(
+  expressWinston.logger({
+    winstonInstance: logger,
+    statusLevels: true,
+  })
+);
+
 // Home Page
 server.get("/", checkNotAuthenticated, (req, res) => {
   res.render("login.ejs", { port: PORT });

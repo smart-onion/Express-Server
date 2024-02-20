@@ -11,7 +11,7 @@ router.get(
   checkNotAuthenticated,
   isAdminRole,
   (req, res) => {
-    res.render("register.ejs");
+    res.render("register.ejs", {role: req.user.role});
   }
 );
 // /users/register

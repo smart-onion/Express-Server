@@ -5,7 +5,6 @@ import { checkNotAuthenticated } from "../utils/auth.js";
 const router = express.Router();
 // /users/guest-password
 router.get("/", checkNotAuthenticated, async (req, res) => {
-  console.log(req.session?.message);
   const passLogs = await axios.get("/pass-logs");
   res.render("guestPassword.ejs", {
     user: req.user.username,
