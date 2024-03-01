@@ -5,4 +5,9 @@
 </head>
 <body>
   <%- include('./templates/navigation')%>
+  <main>
+    <% if (locals.message) {%>
+      <%= locals.message %>
+      <% } %>
+  </main>
 <%- include('./templates/footer')%>

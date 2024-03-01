@@ -92,6 +92,7 @@
 
 <nav>
   <div class="nav-top" style="margin-top: 1em">
+    <h5 style="text-align: center;">User: <%= locals.user  %></h5>
     <div>
       <a href="/users/dashboard">
         <button type="button" class="btn btn-light">
@@ -142,11 +143,21 @@
     <% } %>
   </div>
   <div>
-    <a href="/users/logout">
-      <button type="button" class="btn btn-light">
-        <img src="/icons/logout.png" alt="" style="width: 30px" />
-        <h5>Log Out</h5>
-      </button></a
-    >
+    <div>
+      <a href="/users/support">
+        <button type="button" class="btn btn-light">
+          <img src="/icons/support.png" alt="" style="width: 30px" />
+          <h5>Support</h5>
+        </button></a
+      >
+    </div>
+    <div>
+      <a href="/users/logout">
+        <button type="button" class="btn btn-light">
+          <img src="/icons/logout.png" alt="" style="width: 30px" />
+          <h5>Log Out</h5>
+        </button></a
+      >
+    </div>
   </div>
 </nav>

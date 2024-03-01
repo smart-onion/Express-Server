@@ -1,0 +1,33 @@
+<%- include('./templates/header')%> <%- include('./templates/navigation')%>
+<link rel="stylesheet" href="/styles/support.css" />
+<main>
+  <% if(locals.message){ %>
+  <h1><%= locals.message %></h1>
+  <% } %>
+  <form action="/users/support" method="POST">
+    <textarea
+      id="call_message"
+      name="message"
+      cols="60"
+      rows="2"
+      placeholder="Your message here. Not required!"
+    ></textarea>
+    <input type="submit" value="Call Support" />
+  </form>
+
+  <table class="table table-striped">
+    <tr>
+      <th>NAME</th>
+      <th>TIME</th>
+      <th>MESSAGE</th>
+    </tr>
+    <% if (locals.data) { %> <% locals.data.forEach(element => { %>
+    <tr>
+      <td><%= element.username %></td>
+      <td><%= element.time.toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'medium',hour12: false}) %></td>
+      <td><%= element.message %></td>
+    </tr>
+    <% }) %> <% } %>
+  </table>
+</main>
+<%- include('./templates/footer')%>
