@@ -39,19 +39,22 @@
       <th>DELETE</th>
     </tr>
     <% if (locals.users) { %> 
-      <% locals.users.forEach(element => { %>
-    <tr>
+      <% locals.users.forEach((element, i) => { %>
+    <tr >
       <td> <%= element.id %> </td>
       <td> <%= element.username %> </td>
       <td> <%= element.role %> </td>
-      <td> 
-        <button style="border: none;">
+      <td id="<%= i %>" class="delete" style="width: 5%;"> 
+        <form action="/users/register" method="GET"">
+
+        <button style="border: none;" class="btn" type="submit">
           <img src="/icons/trash.png" alt="">
-        </button>
+        </button></form>
       </td>
     </tr>
     <% }) %> <% } %>
   </table>
 </main>
-
+<%- include('./templates/scripts')%>
+<script src="/javaschript/register.js"></script>
 <%- include('./templates/footer')%>

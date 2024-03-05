@@ -3,7 +3,9 @@ import express from "express";
 import bcrypt from "bcrypt";
 import pool from "../utils/dbConfig.js"; // Importing database connection pool
 import { checkNotAuthenticated, isAdminRole } from "../utils/auth.js"; // Importing authentication middleware
-
+import dotenv from "dotenv";
+// Load environment variables from .env file into process.env
+dotenv.config();
 // Create a router instance
 const router = express.Router();
 
@@ -79,13 +81,18 @@ router.post("/", checkNotAuthenticated, isAdminRole, async (req, res) => {
               if (err) throw err;
               console.log("warning", result.rows);
               req.flash("success_msg", "You registered. Please log in");
-              res.redirect("/users/login");
+              res.redirect("/users/register");
             }
           );
         }
       }
     );
   }
+});
+
+router.delete("/", checkNotAuthenticated, (req, res) => {
+  console.log(req.body.username.trim());
+  pool.query(`DELETE FROM users WHERE username='${req.body.username.trim()}'`);
 });
 
 // Export the router module

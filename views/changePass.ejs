@@ -1,5 +1,6 @@
-<%- include('./templates/header')%> <%-
-include('./templates/navigation')%>
+<%- include('./templates/header')%>
+<%- include('./templates/navigation')%>
+
 <main>
   <% if (locals.message){ %>
   <div class="alert alert-danger" role="alert"><%= message %> <% } %></div>
@@ -13,4 +14,4 @@ include('./templates/navigation')%>
     <script src="/js/bootstrap.min.js"></script>
   </form>
 </main>
-<%- include('./templates/footer')%>
+<%- include('./templates/scripts')%> <%- include('./templates/footer')%>

@@ -14,7 +14,6 @@ router.get("/", checkNotAuthenticated, async (req, res) => {
 
   // Fetch password change logs from external API
   const passLogs = await axios.get("/pass-logs");
-
   // Render the guest password management page with user information, password change logs, role, and any message
   res.render("guestPassword.ejs", {
     user: req.user.username,
@@ -27,14 +26,41 @@ router.get("/", checkNotAuthenticated, async (req, res) => {
 // Handle POST request to "/users/guest-password" endpoint
 router.post("/", checkNotAuthenticated, async (req, res) => {
   // Make a POST request to change the password
-  const result = await axios.post("/change-password", {
-    username: req.body.username,
-    sessionID: req.hostname,
-    user: req.user.username,
-    password: req.user.password,
-    hostname: req.hostname,
-  });
-
+  var result;
+  console.log(req.body.action);
+  switch (req.body.action) {
+    case "PASSWORD":
+      result = await axios.post("/change-password", {
+        username: req.body.username,
+        sessionID: req.hostname,
+        user: req.user.username,
+        password: req.user.password,
+        hostname: req.hostname,
+        action: req.body?.action,
+      });
+      break;
+    case "1154":
+      result = await axios.post("/error-1154", {
+        username: req.body.username,
+        sessionID: req.hostname,
+        user: req.user.username,
+        password: req.user.password,
+        hostname: req.hostname,
+        action: req.body?.action,
+      });
+      break;
+    case "DETAIL":
+      result = await axios.post("/get-details", {
+        username: req.body.username,
+        sessionID: req.hostname,
+        user: req.user.username,
+        password: req.user.password,
+        hostname: req.hostname,
+        action: req.body?.action,
+      });
+      break;
+  }
+  console.log(result.data);
   // Handle different results from the password change attempt
   if (result.data === "NOT_FOUND") {
     // If user not found, set a message in session and redirect back to the guest password management page
@@ -42,7 +68,21 @@ router.post("/", checkNotAuthenticated, async (req, res) => {
     res.redirect("/users/guest-password");
   } else if (result.data === "PASSWORD_CHANGED") {
     // If password changed successfully, set a message in session and redirect back to the guest password management page
-    req.session.message = `Password for user ${req.body.username} has been changed!`;
+    req.session.message = `Password for user ${req.body.username} has been changed to '1111'!`;
+    res.redirect("/users/guest-password");
+  } else if (result.data === "FIXED") {
+    req.session.message = `Error fixed for user ${req.body.username}!`;
+    res.redirect("/users/guest-password");
+  } else if (result.data === "DETAIL") {
+    // req.session.message = `Get detail for user ${req.body.username}!`;
+    res.sendFile(`${process.env.DETAILS_PATH}[${req.hostname}]Details.html`, {
+      headers: {
+        "Content-Disposition": "attachment", // Force browser to download
+      },
+    });
+    // res.redirect("/users/guest-password");
+  } else if (result.data === "NO_DETAIL") {
+    req.session.message = `${req.body.username} did not buy WiFi!`;
     res.redirect("/users/guest-password");
   }
 });
